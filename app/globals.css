@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html { -webkit-text-size-adjust: 100%; }
+  body { @apply bg-paper font-sans text-ink antialiased; }
+  h1, h2, h3 { @apply font-display; }
+  :focus-visible { outline: 3px solid #4056E0; outline-offset: 2px; border-radius: 6px; }
+  button, [role="button"], a { -webkit-tap-highlight-color: transparent; }
+}
+
+@layer utilities {
+  .touch-safe { touch-action: manipulation; -webkit-user-select: none; user-select: none; }
+  .scrollbar-thin { scrollbar-width: thin; }
+}
+
+@keyframes confetti {
+  0% { transform: translate3d(0, -10vh, 0) rotate(0deg); opacity: 1; }
+  100% { transform: translate3d(var(--dx), 105vh, 0) rotate(var(--rot)); opacity: 0.9; }
+}
+
+.confetti-piece {
+  position: absolute; top: 0; width: 10px; height: 16px; border-radius: 2px;
+  animation: confetti var(--dur) linear var(--delay) forwards; will-change: transform;
+}
+
+/* Hormati preferensi sistem dan pengaturan "Kurangi animasi" milik pengguna */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important; }
+  .confetti-piece { display: none; }
+}
+[data-reduce-motion="true"] *, [data-reduce-motion="true"] *::before, [data-reduce-motion="true"] *::after {
+  animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important;
+}
+[data-reduce-motion="true"] .confetti-piece { display: none; }
