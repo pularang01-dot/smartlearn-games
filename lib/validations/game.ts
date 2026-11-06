@@ -10,6 +10,8 @@ export const gameSettingsSchema = z.object({
   questionLimit: z.number().int().min(1).max(200).nullable().default(null),
   allowGoBack: z.boolean().default(false),
   soundEnabled: z.boolean().default(true),
+  playStyle: z.enum(["classic", "battle"]).default("classic"),
+  battleLives: z.number().int().min(1).max(10).default(3),
   cameraMode: z.boolean().default(false),
   cameraCountdown: z.number().int().min(3).max(60).default(10),
   showExplanation: z.boolean().default(true),

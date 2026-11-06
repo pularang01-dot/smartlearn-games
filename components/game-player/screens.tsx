@@ -17,10 +17,13 @@ import type { PlayGame, PlayQuestion } from "@/types/db";
 import { AnswerPanel, type PanelState } from "./answer-panel";
 import type { ReactNode } from "react";
 import { Confetti } from "./confetti";
+import { MonsterSvg } from "./battle-ui";
+import type { BattleOutcome } from "@/features/sessions/battle";
 
 // ------------------------------------------------------------------ intro
 
-export function IntroScreen({ game, total, label, onLabel, showLabel, soundOn, onSound, musicOn, onMusic, onFullscreen, onStart, cameraMode, onCameraMode, cameraSlot, canStart }: {
+export function IntroScreen({ game, total, label, onLabel, showLabel, soundOn, onSound, musicOn, onMusic, onFullscreen, onStart, cameraMode, onCameraMode, cameraSlot, canStart, battleInfo }: {
+  battleInfo?: { hp: number; lives: number; variant: number };
   game: PlayGame; total: number; label: string; onLabel: (v: string) => void; showLabel: boolean; soundOn: boolean; onSound: () => void; musicOn: boolean; onMusic: () => void; onFullscreen: () => void; onStart: () => void;
   cameraMode: boolean; onCameraMode: (v: boolean) => void; cameraSlot: ReactNode; canStart: boolean;
 }) {
@@ -36,6 +39,16 @@ export function IntroScreen({ game, total, label, onLabel, showLabel, soundOn, o
         <h1 className="text-3xl font-semibold leading-tight sm:text-5xl">{game.title}</h1>
         {game.description && <p className="mx-auto mt-3 max-w-xl text-ink-soft">{game.description}</p>}
         <p className="mt-4 text-lg font-semibold text-brand-700">{total} pertanyaan{s.timerEnabled ? ` · timer ${s.defaultTimeLimit} dtk/soal (bawaan)` : ""}</p>
+
+        {battleInfo && (
+          <div className="mx-auto mt-5 flex max-w-2xl items-center gap-4 rounded-2xl bg-brand-50 p-4 text-left">
+            <MonsterSvg mood="idle" variant={battleInfo.variant} className="h-20 w-20 shrink-0 sm:h-24 sm:w-24" />
+            <div>
+              <p className="font-display text-xl font-semibold text-brand-700 sm:text-2xl">Lawan Monster!</p>
+              <p className="text-sm text-ink-soft sm:text-base">Jawaban benar melukai monster (HP {battleInfo.hp}); 3 benar beruntun = <strong>serangan kritis</strong>. Jawaban salah atau waktu habis mengurangi <strong>nyawa kelas</strong> (kelas punya {battleInfo.lives}). Kalahkan monster sebelum nyawa habis!</p>
+            </div>
+          </div>
+        )}
 
         <ul className="mx-auto mt-6 grid max-w-2xl gap-3 text-left sm:grid-cols-2">
           <li className="flex items-center gap-3 rounded-2xl bg-correct-light p-3 text-correct-dark"><span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-correct text-white"><Check className="h-6 w-6" strokeWidth={3} aria-hidden /></span><span className="font-semibold">Sentuh panel hijau jika pernyataan benar.</span></li>
@@ -75,7 +88,8 @@ function questionSize(len: number) {
   return "text-xl sm:text-3xl lg:text-4xl";
 }
 
-export function QuestionScreen({ question, index, total, score, streak, comboOn, remainingMs, limitMs, phase, record, paused, showExplanation, isLast, onAnswer, onNext, renderCamera }: {
+export function QuestionScreen({ question, index, total, score, streak, comboOn, remainingMs, limitMs, phase, record, paused, showExplanation, isLast, onAnswer, onNext, renderCamera, battleHud }: {
+  battleHud?: ReactNode;
   question: PlayQuestion; index: number; total: number; score: number; streak: number; comboOn: boolean; remainingMs: number | null; limitMs: number | null;
   phase: "question" | "feedback"; record: AnswerRecord | undefined; paused: boolean; showExplanation: boolean; isLast: boolean; onAnswer: (v: boolean) => void; onNext: () => void;
   /** Mode kamera: kamera memenuhi seluruh area soal; teks soal menjadi banner ringkas di atasnya. */
@@ -139,6 +153,7 @@ export function QuestionScreen({ question, index, total, score, streak, comboOn,
     return (
       <div className="flex h-full flex-col gap-2 p-2 sm:p-3">
         {header}
+        {battleHud}
         <div className="relative min-h-0 flex-1">
           {renderCamera({ panelState })}
           <section key={question.id} className="absolute inset-x-3 top-3 z-20 flex max-h-[32%] animate-slide-in items-center gap-3 overflow-y-auto rounded-2xl bg-white/90 p-3 shadow-xl backdrop-blur-sm sm:px-5">
@@ -154,6 +169,7 @@ export function QuestionScreen({ question, index, total, score, streak, comboOn,
   return (
     <div className="flex h-full flex-col gap-3 p-3 sm:gap-4 sm:p-5">
       {header}
+      {battleHud}
       <section key={question.id} className="flex min-h-0 flex-1 animate-slide-in flex-col items-center justify-center gap-4 overflow-y-auto rounded-[2rem] bg-white p-5 text-center shadow-lg sm:p-8">
         {question.image_url && <img src={question.image_url} alt="" className="max-h-[38%] min-h-[80px] w-auto max-w-full rounded-2xl object-contain" />}
         <p className={cn("max-w-5xl font-display font-medium leading-snug text-ink", questionSize(question.question_text.length))}>{question.question_text}</p>
@@ -171,7 +187,8 @@ export function QuestionScreen({ question, index, total, score, streak, comboOn,
 
 export type SaveState = "idle" | "saving" | "saved" | "error" | "unsaved";
 
-export function ResultScreen({ summary, questions, records, durationSeconds, badges, saveState, saveError, onRetrySave, onRestart, mode, sessionId, exitHref, shareToken, canDuplicate }: {
+export function ResultScreen({ summary, questions, records, durationSeconds, badges, saveState, saveError, onRetrySave, onRestart, mode, sessionId, exitHref, shareToken, canDuplicate, battle }: {
+  battle?: { outcome: BattleOutcome; variant: number };
   summary: SessionSummary; questions: PlayQuestion[]; records: (AnswerRecord | undefined)[]; durationSeconds: number; badges: string[]; saveState: SaveState; saveError?: string;
   onRetrySave: () => void; onRestart: () => void; mode: "owner" | "preview" | "shared"; sessionId: string; exitHref: string; shareToken?: string; canDuplicate?: boolean;
 }) {
@@ -195,10 +212,20 @@ export function ResultScreen({ summary, questions, records, durationSeconds, bad
 
   return (
     <div className="relative h-full overflow-y-auto p-4 sm:p-8">
-      {summary.correct > 0 && <Confetti />}
+      {(battle ? battle.outcome === "win" : summary.correct > 0) && <Confetti />}
       <div className="relative z-30 mx-auto max-w-4xl animate-slide-in rounded-[2rem] bg-white p-6 text-center shadow-xl sm:p-10">
-        <Trophy className="mx-auto h-14 w-14 text-pencil-500" aria-hidden />
-        <h1 className="mt-2 text-3xl font-semibold sm:text-5xl">Permainan selesai!</h1>
+        {battle ? (
+          <>
+            <MonsterSvg mood={battle.outcome === "win" ? "dead" : "laugh"} variant={battle.variant} className="mx-auto h-28 w-28 sm:h-36 sm:w-36" />
+            <h1 className="mt-2 text-3xl font-semibold sm:text-5xl">{battle.outcome === "win" ? "Monster dikalahkan!" : battle.outcome === "lose" ? "Nyawa kelas habis, monster menang!" : "Monster masih bertahan!"}</h1>
+            <p className="mt-1 text-ink-soft">{battle.outcome === "win" ? "Kerja sama kelas hebat sekali." : "Pelajari lagi lalu coba sekali lagi. Pasti bisa!"}</p>
+          </>
+        ) : (
+          <>
+            <Trophy className="mx-auto h-14 w-14 text-pencil-500" aria-hidden />
+            <h1 className="mt-2 text-3xl font-semibold sm:text-5xl">Permainan selesai!</h1>
+          </>
+        )}
         <p className="mt-3 font-display text-6xl font-semibold text-brand-600 sm:text-8xl" aria-label={`Skor akhir ${summary.score}`}>{summary.score}</p>
         <p className="text-sm font-semibold text-ink-soft">skor akhir</p>
 

@@ -22,6 +22,8 @@ Legenda: ✅ dikerjakan | ⚠️ dikerjakan sebagian / perlu verifikasi di lingk
 | Pemutar Smartboard (panel besar, timer, skor, combo, bonus, jeda, fullscreen, keyboard, suara, confetti, toolbar) | ✅ ⚠️ | Wajib uji di Smartboard nyata (docs/TESTING.md) |
 | Mode: Benar/Salah | ✅ | |
 | Mode Pilihan Ganda, Mencocokkan | ⏭️ | Skema siap (`game_mode`, `options`); butuh migration CHECK + komponen |
+| Gaya permainan Lawan Monster | ✅ ⚠️ | Aturan diuji (13 test: HP, kritis, nyawa, menang/kalah/seri, mesin permainan, lencana); tampilan SVG/animasi belum dicoba di layar nyata. Tanpa migration (disimpan di `games.settings` JSON) |
+| Mode kamera (berdiri kiri/kanan) | ✅ ⚠️ | Deteksi perbedaan-latar lokal, tanpa AI; logika diuji (12 test), **wajib uji di kamera/Smartboard nyata**. Hasil = suara mayoritas kelas, bukan per anak. Pose/gesture (MediaPipe) = roadmap |
 | Tantangan Acak | ✅ (sebagai pengaturan) | Acak urutan + batas jumlah soal + soal wajib/opsional |
 | Musik latar | ✅ | Nada sederhana WebAudio, default mati |
 | Audio per soal (`audio_path`) | ⏭️ | Kolom tersedia, belum ada UI |
@@ -43,4 +45,4 @@ Legenda: ✅ dikerjakan | ⚠️ dikerjakan sebagian / perlu verifikasi di lingk
 5. Tinjau kebijakan privasi/syarat dengan pihak berwenang.
 
 ## Roadmap yang disarankan
-Pilihan Ganda → Mencocokkan → audio soal → halaman admin → impor `.xlsx` → rate limit edge → export PDF laporan → mode kompetisi tim.
+Pilihan Ganda (zona kamera 4 arah) → Balapan Roket/Mode Tim → Mencocokkan → audio soal → halaman admin → impor `.xlsx` → rate limit edge → export PDF laporan → mode kompetisi tim.

@@ -56,6 +56,9 @@ export const sfx = {
     tone(300, 0, 0.12, "square", 0.08);
     tone(300, 0.2, 0.12, "square", 0.08);
   },
+  lose: () => {
+    [392, 330, 262, 196].forEach((f, i) => tone(f, i * 0.16, 0.28, "sawtooth", 0.09));
+  },
   finish: () => {
     [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => tone(f, i * 0.12, 0.25, "triangle"));
   },

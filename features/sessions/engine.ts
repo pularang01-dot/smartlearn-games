@@ -1,4 +1,5 @@
 import { scoreAnswer, timeLimitFor, type ScoringSettings } from "./scoring";
+import { battleStatus, eventsFromRecords } from "./battle";
 import type { PlayQuestion } from "@/types/db";
 
 export type PlayPhase = "intro" | "question" | "feedback" | "result";
@@ -37,7 +38,7 @@ export type PlayAction =
 
 export type EngineConfig = {
   questions: PlayQuestion[];
-  settings: ScoringSettings & { allowGoBack: boolean };
+  settings: ScoringSettings & { allowGoBack: boolean; playStyle?: "classic" | "battle"; battleLives?: number };
 };
 
 export function initialState(): PlayState {
@@ -117,9 +118,15 @@ export function playReducer(state: PlayState, action: PlayAction, cfg: EngineCon
       return advance({ ...state, records }, cfg, action.now);
     }
 
-    case "NEXT":
+    case "NEXT": {
       if (state.phase !== "feedback") return state;
+      // Lawan Monster: permainan berakhir begitu monster kalah atau nyawa kelas habis.
+      if (cfg.settings.playStyle === "battle") {
+        const st = battleStatus(eventsFromRecords(state.records), cfg.questions.length, cfg.settings.battleLives ?? 3);
+        if (st.over) return { ...state, phase: "result", endedAt: action.now, paused: false };
+      }
       return advance(state, cfg, action.now);
+    }
 
     case "PREV": {
       if (!cfg.settings.allowGoBack || state.index === 0) return state;

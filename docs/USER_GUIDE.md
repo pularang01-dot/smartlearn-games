@@ -37,6 +37,23 @@ Tab **Pengaturan permainan**: timer per soal, timeout dianggap salah, bonus kece
 | Enter / Spasi | Mulai / Lanjut |
 | P · M · F · H | Jeda · Suara · Layar penuh · Toolbar |
 
+## 6a. Gaya permainan "Lawan Monster"
+Tab **Pengaturan permainan > Gaya permainan > Lawan Monster**. Soal tidak perlu diubah: semua game Benar/Salah (termasuk 5 topik CSV) bisa dimainkan dengan gaya ini.
+- Kelas melawan satu monster. **HP monster = setengah jumlah soal** (10 soal = 5 HP).
+- **Jawaban benar** melukai monster 1 HP. **3 benar beruntun** atau lebih = **serangan kritis** (2 HP).
+- **Jawaban salah atau waktu habis** mengurangi 1 **nyawa kelas** (bawaan 3, bisa 1-10).
+- Menang bila HP monster habis (permainan langsung selesai); kalah bila nyawa habis. Bila soal habis sebelum keduanya terjadi, hasilnya seri.
+- Cocok digabung dengan Mode kamera: seluruh kelas berdiri di sisi jawaban, lalu menyaksikan monster terkena serangan.
+- Hasil tersimpan seperti biasa (skor, akurasi) ditambah hasil pertarungan, dan lencana **Pembasmi Monster** saat menang.
+
+## 6b. Mode kamera (anak berdiri di sisi jawaban)
+1. Nyalakan **Mode kamera** di Pengaturan permainan (atau di layar awal saat bermain).
+2. Klik **Nyalakan kamera**, izinkan di browser, posisikan kamera diam menghadap area berdiri.
+3. **Kalibrasi sekarang**: semua anak keluar dari area kamera selama hitung mundur 3 detik.
+4. **Mulai**. Anak-anak berdiri di **kiri (BENAR)** atau **kanan (SALAH)**. Saat hitung mundur habis, sisi yang lebih banyak terisi menjadi jawaban; **Kunci jawaban**/Enter mengunci lebih cepat. Imbang atau kosong = belum terkunci/timeout.
+5. Masalah? Tombol ←/→ untuk override guru, atau ikon kamera-coret di toolbar untuk beralih ke sentuhan.
+Gambar kamera tidak direkam atau dikirim, dan kamera mati saat permainan selesai.
+
 ## 7. Hasil dan laporan
 - **Riwayat sesi**: setiap sesi + detail jawaban per soal.
 - **Laporan**: rata-rata skor/akurasi, filter tanggal (WIB) dan game, **Ekspor CSV**.

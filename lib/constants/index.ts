@@ -23,5 +23,6 @@ export const GRADE_SUGGESTIONS = [
 export const BADGES: Record<string, { label: string; description: string }> = {
   first_session: { label: "Permainan pertama", description: "Menyelesaikan sesi permainan pertama." },
   perfect_score: { label: "Sempurna", description: "Semua jawaban benar." },
+  monster_slayer: { label: "Pembasmi Monster", description: "Mengalahkan monster pada mode Lawan Monster." },
   combo_5: { label: "Combo 5", description: "5 jawaban benar berturut-turut." },
 };

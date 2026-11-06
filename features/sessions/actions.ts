@@ -7,6 +7,7 @@ import { dbFail, fail, ok, zodFail, type ActionResult } from "@/lib/errors";
 import { parseSettings } from "@/lib/validations/game";
 import { evaluateSession, type SessionSummary } from "./scoring";
 import { computeBadges } from "./badges";
+import { battleStatus, outcomeOf } from "./battle";
 
 const payloadSchema = z.object({
   sessionId: z.string().uuid(),
@@ -70,7 +71,10 @@ export async function saveSession(input: unknown): Promise<ActionResult<SaveSess
   const duration = Math.min(86_400, Math.max(0, Math.round((ended - started) / 1000)));
 
   const { count: previous } = await supabase.from("game_sessions").select("id", { count: "exact", head: true }).eq("owner_id", user.id);
-  const badges = computeBadges(summary, (previous ?? 0) === 0);
+  // Lawan Monster: hasil dihitung ulang dari jawaban (tidak mempercayai klien).
+  const battle = settings.playStyle === "battle" ? battleStatus([...scored].sort((x, y) => x.position - y.position).map((s) => ({ correct: s.isCorrect })), p.order.length, settings.battleLives) : null;
+  const battleOutcome = battle ? outcomeOf(battle) : undefined;
+  const badges = computeBadges(summary, (previous ?? 0) === 0, battleOutcome);
 
   const { data, error } = await supabase.rpc("save_game_session", {
     p_session: {
@@ -80,7 +84,7 @@ export async function saveSession(input: unknown): Promise<ActionResult<SaveSess
       total_questions: summary.totalQuestions, total_score: summary.score, correct_count: summary.correct,
       incorrect_count: summary.incorrect, timeout_count: summary.timeouts, accuracy: summary.accuracy,
       duration_seconds: duration, game_mode: game.game_mode,
-      session_config: { settings, order: p.order },
+      session_config: { settings, order: p.order, ...(battle ? { battle: { outcome: battleOutcome, monsterHp: battle.hp, monsterMaxHp: battle.maxHp, lives: battle.lives, maxLives: battle.maxLives } } : {}) },
     },
     p_answers: scored.map((a) => ({
       question_id: a.questionId, position: a.position, question_text: a.questionText, correct_answer: a.correctAnswer,

@@ -194,6 +194,16 @@ export function GameEditor({ game, questions, subjects: initialSubjects, shares,
       <div role="tabpanel" id="panel-settings" aria-labelledby="tab-settings" hidden={tab !== "settings"}>
         <div className="space-y-2 rounded-2xl border border-line bg-white p-6">
           <p className="pb-2 text-sm text-ink-soft">Pengaturan ini berlaku saat game dimainkan di Smartboard.</p>
+          <SelectField label="Gaya permainan" value={s.playStyle} onChange={(ev) => updateSettings({ playStyle: ev.target.value as GameSettings["playStyle"] })} hint="Klasik: kumpulkan skor. Lawan Monster: kelas melawan monster bersama-sama.">
+            <option value="classic">Klasik (skor dan akurasi)</option>
+            <option value="battle">Lawan Monster (nyawa kelas vs HP monster)</option>
+          </SelectField>
+          {s.playStyle === "battle" && (
+            <div className="max-w-xs rounded-xl bg-paper p-4">
+              <NumberField label="Nyawa kelas" min={1} max={10} value={s.battleLives} onChange={(n) => n !== null && updateSettings({ battleLives: n })} hint="HP monster = setengah jumlah soal. Jawaban salah atau timeout mengurangi 1 nyawa; 3 benar beruntun = serangan kritis (2 HP)." />
+            </div>
+          )}
+          <hr className="border-line" />
           <Switch checked={s.timerEnabled} onChange={(v) => updateSettings({ timerEnabled: v })} label="Aktifkan timer per soal" description="Hitung mundur untuk setiap pertanyaan. Waktu habis dicatat sebagai timeout." />
           {s.timerEnabled && (
             <div className="grid gap-4 rounded-xl bg-paper p-4 sm:grid-cols-2">

@@ -14,6 +14,7 @@ export default async function SessionDetailPage({ params }: { params: Promise<{ 
   if (!data) notFound();
   const { session: s, game, answers } = data;
 
+  const battleOutcome = (s.session_config?.battle as { outcome?: "win" | "lose" | "draw" } | undefined)?.outcome;
   const stats: [string, string | number][] = [
     ["Skor", s.total_score], ["Benar", s.correct_count], ["Salah", s.incorrect_count], ["Timeout", s.timeout_count],
     ["Akurasi", formatPercent(Number(s.accuracy))], ["Durasi", formatDuration(s.duration_seconds)],
@@ -21,7 +22,10 @@ export default async function SessionDetailPage({ params }: { params: Promise<{ 
   return (
     <>
       <Breadcrumb items={[{ label: "Riwayat sesi", href: "/dashboard/sessions" }, { label: game?.title ?? "Sesi" }]} />
-      <PageHeader title={game?.title ?? "(game dihapus)"} description={`${s.session_label ? `${s.session_label} · ` : ""}${formatDateTime(s.started_at)}`} actions={s.status === "ended_early" ? <Badge tone="warning">Diakhiri lebih awal</Badge> : undefined} />
+      <PageHeader title={game?.title ?? "(game dihapus)"} description={`${s.session_label ? `${s.session_label} · ` : ""}${formatDateTime(s.started_at)}`} actions={<>
+        {s.status === "ended_early" && <Badge tone="warning">Diakhiri lebih awal</Badge>}
+        {battleOutcome && <Badge tone={battleOutcome === "win" ? "success" : battleOutcome === "lose" ? "danger" : "neutral"}>Lawan Monster: {battleOutcome === "win" ? "menang" : battleOutcome === "lose" ? "kalah" : "seri"}</Badge>}
+      </>} />
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
         {stats.map(([label, value]) => (
           <Card key={label} className="text-center"><p className="font-display text-2xl font-semibold">{value}</p><p className="text-xs text-ink-soft">{label}</p></Card>

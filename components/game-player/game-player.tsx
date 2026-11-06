@@ -9,6 +9,8 @@ import { buildPlayOrder } from "@/features/sessions/order";
 import { currentStreak, initialState, playReducer, totalScore, type EngineConfig, type PlayAction, type PlayState } from "@/features/sessions/engine";
 import { saveSession } from "@/features/sessions/actions";
 import { computeBadges } from "@/features/sessions/badges";
+import { battleStatus, eventsFromRecords, monsterMaxHp, outcomeOf } from "@/features/sessions/battle";
+import { BattleHud, type MonsterMood } from "./battle-ui";
 import { summarize, timeLimitFor, type ScoredAnswer, type SessionSummary } from "@/features/sessions/scoring";
 import { sfx, startMusic, stopMusic } from "@/lib/sound";
 import { newId } from "@/lib/utils/misc";
@@ -74,6 +76,15 @@ function PlayRun({ mode, game, questions, exitHref, shareToken, canDuplicate, la
 
   const q = ordered[state.index];
   const record = state.records[state.index];
+
+  // ---- Lawan Monster (diturunkan dari catatan jawaban; tidak ada state tambahan)
+  const isBattle = settings.playStyle === "battle";
+  const battle = useMemo(() => (isBattle ? battleStatus(eventsFromRecords(state.records), ordered.length, settings.battleLives) : null), [isBattle, state.records, ordered.length, settings.battleLives]);
+  const battleOutcome = battle ? outcomeOf(battle) : undefined;
+  const monsterVariant = useMemo(() => Array.from(game.id).reduce((n, c) => n + c.charCodeAt(0), 0) % 5, [game.id]);
+  const mood: MonsterMood = battle && state.phase === "feedback" && record
+    ? (battle.over === "win" ? "dead" : record.kind === "answered" && record.isCorrect ? "hit" : record.kind === "skipped" ? "idle" : "laugh")
+    : "idle";
   const inQuestion = state.phase === "question";
   const limitSec = q && inQuestion ? timeLimitFor(q, settings) : null;
 
@@ -152,7 +163,7 @@ function PlayRun({ mode, game, questions, exitHref, shareToken, canDuplicate, la
   const localSummary = useMemo(() => summarize(scored, ordered.length, settings), [scored, ordered.length, settings]);
   const summary = serverSummary ?? localSummary;
   const durationSeconds = state.startedAt && state.endedAt ? Math.round((state.endedAt - state.startedAt) / 1000) : 0;
-  const badges = useMemo(() => Array.from(new Set([...computeBadges(summary, false), ...serverBadges])), [summary, serverBadges]);
+  const badges = useMemo(() => Array.from(new Set([...computeBadges(summary, false, battleOutcome), ...serverBadges])), [summary, serverBadges, battleOutcome]);
 
   // ---- simpan sesi (hanya mode owner). Skor dihitung ulang server-side.
   const doSave = useCallback(async () => {
@@ -179,9 +190,9 @@ function PlayRun({ mode, game, questions, exitHref, shareToken, canDuplicate, la
   useEffect(() => {
     if (state.phase !== "result" || savedOnce.current) return;
     savedOnce.current = true;
-    play(sfx.finish);
+    play(battleOutcome && battleOutcome !== "win" ? sfx.lose : sfx.finish);
     void doSave();
-  }, [state.phase, doSave, play]);
+  }, [state.phase, doSave, play, battleOutcome]);
 
   // ---- layar penuh
   useEffect(() => {
@@ -269,13 +280,15 @@ function PlayRun({ mode, game, questions, exitHref, shareToken, canDuplicate, la
         {state.phase === "intro" && (
           <IntroScreen game={game} total={ordered.length} label={label} onLabel={onLabel} showLabel={mode === "owner"} soundOn={soundOn} onSound={toggleSound} musicOn={musicOn} onMusic={toggleMusic} onFullscreen={() => void toggleFullscreen()} onStart={start}
             cameraMode={cameraMode} onCameraMode={(v) => { setCameraMode(v); if (!v) cam.stop(); }} canStart={!cameraMode || zones.calibrated}
-            cameraSlot={<CameraSetup camera={cam} zones={zones} sensitivity={sensitivity} onSensitivity={changeSensitivity} />} />
+            cameraSlot={<CameraSetup camera={cam} zones={zones} sensitivity={sensitivity} onSensitivity={changeSensitivity} />}
+            battleInfo={isBattle ? { hp: monsterMaxHp(ordered.length), lives: settings.battleLives, variant: monsterVariant } : undefined} />
         )}
         {(state.phase === "question" || state.phase === "feedback") && q && (
           <QuestionScreen
             question={q} index={state.index} total={ordered.length} score={totalScore(state.records)} streak={currentStreak(state)} comboOn={settings.comboBonusEnabled}
             remainingMs={cameraMode ? null : clock.remainingMs} limitMs={limitSec !== null && !cameraMode ? limitSec * 1000 : null} phase={state.phase} record={record} paused={state.paused}
-            showExplanation={settings.showExplanation} isLast={state.index === ordered.length - 1} onAnswer={answer} onNext={next}
+            showExplanation={settings.showExplanation} isLast={state.index === ordered.length - 1 || (state.phase === "feedback" && battle?.over != null)} onAnswer={answer} onNext={next}
+            battleHud={battle ? <BattleHud status={battle} mood={mood} hitKey={`${state.index}-${state.phase}`} variant={monsterVariant} /> : undefined}
             renderCamera={cameraMode ? ({ panelState }) => (
               <CameraZones stream={cam.stream} reading={zones.reading} decide={zones.decide} resetKey={state.index} durationMs={cameraDurationMs}
                 active={state.phase === "question"} paused={state.paused} panelState={panelState} onLock={lockCamera} registerLock={registerLock} onFallback={disableCamera} />
@@ -285,6 +298,7 @@ function PlayRun({ mode, game, questions, exitHref, shareToken, canDuplicate, la
         {state.phase === "result" && (
           <ResultScreen
             summary={summary} questions={ordered} records={state.records} durationSeconds={durationSeconds} badges={badges} saveState={saveState} saveError={saveError}
+            battle={battle ? { outcome: outcomeOf(battle), variant: monsterVariant } : undefined}
             onRetrySave={() => void doSave()} onRestart={onRestart} mode={mode} sessionId={sessionId} exitHref={exitHref} shareToken={shareToken} canDuplicate={canDuplicate}
           />
         )}
