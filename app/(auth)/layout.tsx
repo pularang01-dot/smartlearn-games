@@ -1,5 +1,6 @@
 import { Logo } from "@/components/ui/logo";
 import { hasSupabaseEnv } from "@/lib/supabase/env";
+import { Copyright } from "@/components/ui/copyright";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -13,6 +14,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         )}
         {children}
       </div>
+      <Copyright className="mt-6 max-w-md text-center text-xs text-ink-mute" />
     </div>
   );
 }

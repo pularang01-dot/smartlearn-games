@@ -9,12 +9,18 @@ Dibangun dengan Next.js (App Router) + TypeScript + Tailwind CSS + Supabase (Aut
 > belum dijalankan). Ikuti langkah verifikasi di bawah; kemungkinan ada beberapa perbaikan tipe/lint kecil. Lihat
 > [docs/ACCEPTANCE.md](docs/ACCEPTANCE.md) untuk status per fitur.
 
+## Hak cipta
+
+© 2026 Viky Aditama. Seluruh hak dilindungi (lihat [LICENSE](LICENSE)). Data pengembang dan tautan kontak diatur di `lib/constants/developer.ts`; halaman publiknya ada di `/developer`.
+
 ## Fitur
 
 - Auth guru (daftar, login, logout, verifikasi email, lupa/reset password), profil, preferensi, tur onboarding
 - Game: buat, edit (autosave + deteksi konflik), duplikat, arsip, hapus, terbitkan; cari/filter/urutkan/paginasi
 - Pertanyaan Benar/Salah: penjelasan, gambar (upload dengan progres), poin, batas waktu, soal wajib/opsional, urut ulang (seret / tombol)
 - Bank soal pribadi + impor CSV (pratinjau & laporan error per baris) + ekspor laporan CSV
+- **Lawan Monster**: gaya permainan baru, kelas melawan monster (HP monster vs nyawa kelas, serangan kritis); memakai soal Benar/Salah yang sama
+- **Mode kamera**: anak berdiri di sisi kiri (Benar) / kanan (Salah); deteksi lokal tanpa model AI, tanpa rekaman
 - Pemutar Smartboard: panel besar, timer akurat, skor/combo/bonus waktu, jeda, layar penuh, shortcut keyboard, suara (WebAudio), confetti, toolbar guru yang bisa disembunyikan
 - Skor **dihitung ulang di server**; penyimpanan sesi idempoten & atomik (satu RPC)
 - Riwayat sesi, detail jawaban per soal, laporan + filter tanggal/game

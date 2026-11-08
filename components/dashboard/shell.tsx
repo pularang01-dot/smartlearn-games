@@ -8,6 +8,7 @@ import { Logo, LogoMark } from "@/components/ui/logo";
 import { signOut } from "@/features/auth/actions";
 import { OnboardingTour } from "@/components/onboarding/tour";
 import { cn } from "@/lib/utils/cn";
+import { Copyright } from "@/components/ui/copyright";
 
 const NAV = [
   { href: "/dashboard", label: "Ringkasan", icon: LayoutDashboard, exact: true },
@@ -106,6 +107,7 @@ export function DashboardShell({ displayName, email, showOnboarding, children }:
           </div>
         </header>
         <main id="main" className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6 sm:py-8">{children}</main>
+        <footer className="border-t border-line bg-white px-4 py-3 text-center text-xs text-ink-mute sm:px-6"><Copyright /></footer>
       </div>
       {showOnboarding && <OnboardingTour />}
     </div>

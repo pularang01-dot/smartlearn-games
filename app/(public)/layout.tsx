@@ -3,6 +3,7 @@ import { Logo } from "@/components/ui/logo";
 import { buttonClasses } from "@/components/ui/button";
 import { getCurrentUser } from "@/lib/permissions/auth";
 import { hasSupabaseEnv } from "@/lib/supabase/env";
+import { Copyright } from "@/components/ui/copyright";
 
 export default async function PublicLayout({ children }: { children: React.ReactNode }) {
   const user = hasSupabaseEnv() ? await getCurrentUser() : null;
@@ -26,8 +27,9 @@ export default async function PublicLayout({ children }: { children: React.React
       <main className="flex-1">{children}</main>
       <footer className="border-t border-line bg-white">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-6 text-sm text-ink-soft">
-          <p>© {new Date().getFullYear()} SmartLearn Games</p>
+          <Copyright />
           <div className="flex gap-5">
+            <Link href="/developer" className="hover:text-brand-600 hover:underline">Developer</Link>
             <Link href="/privacy" className="hover:text-brand-600 hover:underline">Kebijakan Privasi</Link>
             <Link href="/terms" className="hover:text-brand-600 hover:underline">Syarat Penggunaan</Link>
           </div>

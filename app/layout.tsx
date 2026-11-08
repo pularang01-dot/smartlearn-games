@@ -10,6 +10,9 @@ const fredoka = Fredoka({ subsets: ["latin"], variable: "--font-fredoka", displa
 export const metadata: Metadata = {
   title: { default: "SmartLearn Games — Game belajar untuk Smartboard", template: "%s · SmartLearn Games" },
   description: "Buat dan mainkan game Benar/Salah interaktif untuk kelas Anda. Dirancang untuk layar sentuh Smartboard.",
+  authors: [{ name: "Viky Aditama" }],
+  creator: "Viky Aditama",
+  publisher: "Viky Aditama",
 };
 
 export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#3345C7" };

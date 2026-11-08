@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "private": true,
   "description": "Platform game pembelajaran interaktif untuk Smartboard",
+  "author": "Viky Aditama",
+  "license": "UNLICENSED",
   "engines": { "node": ">=20.9.0" },
   "scripts": {
     "dev": "next dev",

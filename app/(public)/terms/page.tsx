@@ -15,6 +15,8 @@ export default function TermsPage() {
       <p>Dilarang mengunggah konten yang melanggar hukum, hak cipta, bersifat kekerasan, pornografi, atau menyerang kelompok tertentu. Dilarang mencoba mengakses data guru lain atau mengganggu layanan.</p>
       <h2 className="text-xl font-semibold text-ink">Akun</h2>
       <p>Jaga kerahasiaan password Anda. Anda bertanggung jawab atas aktivitas pada akun Anda.</p>
+      <h2 className="text-xl font-semibold text-ink">Hak kekayaan intelektual</h2>
+      <p>Hak cipta atas aplikasi SmartLearn Games (kode, desain, ilustrasi, dan dokumentasi) dimiliki oleh Viky Aditama. Pengguna tidak diperkenankan menyalin, memodifikasi, atau mendistribusikan ulang aplikasi tanpa izin tertulis. Konten soal yang Anda buat tetap menjadi milik Anda.</p>
       <h2 className="text-xl font-semibold text-ink">Ketersediaan</h2>
       <p>Layanan disediakan apa adanya. Kami berusaha menjaga ketersediaan, namun tidak menjamin layanan bebas gangguan. Lakukan ekspor laporan secara berkala bila data penting bagi Anda.</p>
     </article>
