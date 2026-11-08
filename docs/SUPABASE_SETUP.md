@@ -29,6 +29,9 @@ Setiap file harus selesai tanpa error sebelum lanjut. Bila Anda memakai Supabase
 
 Email bawaan Supabase dibatasi jumlah kirimnya; untuk produksi, pasang SMTP sendiri di **Authentication > SMTP Settings**.
 
+### Template email (nama "Viky Education Smartlearn")
+Template HTML untuk email konfirmasi pendaftaran dan atur ulang kata sandi ada di `supabase/email-templates/` (panduan pemasangan, pengaturan nama pengirim lewat SMTP, dan cara menguji ada di README di folder itu). Setelah dipasang, tautan email mengarah ke `/auth/confirm` dan bisa dibuka di perangkat mana pun.
+
 ## 5. Verifikasi storage
 **Storage** harus berisi bucket `game-assets` (public, batas 2 MB, JPG/PNG/WebP). Dibuat oleh migration 0003.
 

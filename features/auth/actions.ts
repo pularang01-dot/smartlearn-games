@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import type { EmailOtpType } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 import { getSiteUrl } from "@/lib/site";
 import { formFromZod, type FormState } from "@/lib/errors";
@@ -91,4 +92,23 @@ export async function updatePassword(_prev: FormState, formData: FormData): Prom
     return { error: "Gagal mengubah password. Coba lagi." };
   }
   return { message: "Password berhasil diubah." };
+}
+
+const OTP_TYPES: EmailOtpType[] = ["signup", "recovery", "invite", "magiclink", "email_change", "email"];
+
+/**
+ * Menukar token_hash dari tautan email menjadi sesi (verifyOtp). Tidak memakai PKCE, jadi tautan bisa dibuka di
+ * perangkat/browser mana pun (mis. daftar di Smartboard, buka email di HP). Dijalankan lewat klik tombol (POST) agar
+ * pemindai tautan email tidak menghanguskan token lebih dulu.
+ */
+export async function confirmEmailToken(formData: FormData): Promise<void> {
+  const tokenHash = String(formData.get("token_hash") ?? "");
+  const type = String(formData.get("type") ?? "") as EmailOtpType;
+  const next = safeNext(String(formData.get("next") ?? ""), "/dashboard");
+  if (!tokenHash || tokenHash.length > 200 || !OTP_TYPES.includes(type)) redirect("/login?error=link");
+
+  const supabase = await createClient();
+  const { error } = await supabase.auth.verifyOtp({ type, token_hash: tokenHash });
+  if (error) redirect("/login?error=link");
+  redirect(type === "recovery" ? "/reset-password" : next);
 }
